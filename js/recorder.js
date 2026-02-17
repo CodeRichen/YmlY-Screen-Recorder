@@ -148,7 +148,11 @@ async function startRecord() {
     try {
         screenStream = await navigator.mediaDevices.getDisplayMedia({
             video: true,
-            audio: isSystemAudio,
+            audio: {
+                echoCancellation: false, // 關閉迴音消除
+                noiseSuppression: false, // 關閉雜訊抑制
+                autoGainControl: false   // 關閉自動增益 (防止音樂忽大忽小)
+            },
         });
     } catch (e) {
         if (e.message.includes("audio source")) {
@@ -329,7 +333,7 @@ function mergeAudioStreams(screenStream, micStream) {
     if (screenStream.getAudioTracks().length > 0) {
         const source1 = context.createMediaStreamSource(screenStream);
         const systemAudioGain = context.createGain();
-        systemAudioGain.gain.value = 0.75;
+        systemAudioGain.gain.value = 1;
         source1.connect(systemAudioGain).connect(mergeDestination);
     }
 
